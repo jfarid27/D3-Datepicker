@@ -223,6 +223,6 @@ define(function(require, exports, module) {
                     controller.trigger("change:dateRangeLast", timeParam);
                 });
             });
-        })
-    })
-})
+        });
+    });
+});
