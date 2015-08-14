@@ -5,7 +5,7 @@ define(function(require, exports, module) {
 
         var backbone = require("backbone");
 
-        var controller, model, datepicker, MockDatePicker;
+        var controller, model, MockModel, datepicker, MockDatePicker;
         beforeEach(function() {
 
             jasmine.DEFAULT_TIMEOUT_INTERVAL = 500;
@@ -29,7 +29,9 @@ define(function(require, exports, module) {
 
             datepicker = new MockDatePicker();
 
-            model = backbone.Model.extend({
+            MockModel = backbone.Model.extend({});
+
+            model = new MockModel({
                 "unitTime": "day",
                 "selectionType": "start",
                 "today": "2014-06-10",
@@ -43,7 +45,7 @@ define(function(require, exports, module) {
                 }
             });
 
-            controller = new DatepickerController(datepicker, new model());
+            controller = new DatepickerController(datepicker, model);
         });
 
         afterEach(function() {
@@ -97,23 +99,25 @@ define(function(require, exports, module) {
 
         describe("on change:selectedDateRange event", function() {
 
-            var newDateRange;
+            var newStartDate, newEndDate;
             beforeEach(function() {
-                newDateRange = "mockDateRange";
+                newStartDate = "mockStartDate";
+                newEndDate = "mockEndDate";
             });
 
             it("should update model selected start and end dates using datepicker method", function(done) {
                 var cb = function() {
-                    expect(datepicker.$args.pickDates[0]).toBe("mockDateRange");
+                    expect(datepicker.$args.pickDates[0]).toBe("start");
+                    expect(datepicker.$args.pickDates[1]).toBe("mockStartDate");
+                    expect(datepicker.$args.pickDates[2]).toBe("mockEndDate");
                     expect(controller.model.get("selected")).toBe("pickDatesResponse");
                     done();
                 };
-                controller.trigger("change:selectedDateRange", newDateRange, cb);
+                controller.trigger("change:selectedDateRange", newStartDate, newEndDate, cb);
             });
             it("should emit changed:selectedDateRange event", function(done) {
-
                 controller.on("changed:selectedDateRange", done)
-                controller.trigger("change:selectedDateRange", newDateRange);
+                controller.trigger("change:selectedDateRange", newStartDate, newEndDate);
             });
         });
 
@@ -142,7 +146,7 @@ define(function(require, exports, module) {
                 });
                 it("should update model selected start and end dates using datepicker method", function(done) {
                     var cb = function() {
-                        expect(controller.model.get("selected")).toBe("generatePreviosResponse");
+                        expect(controller.model.get("selected")).toBe("generatePreviousResponse");
                         expect(datepicker.$args.generatePrevious[0]).toBe("2014-06-10");
                         expect(datepicker.$args.generatePrevious[1]).toBe(7);
                         expect(datepicker.$args.generatePrevious[2]).toBe("day");
@@ -180,7 +184,7 @@ define(function(require, exports, module) {
             describe("when called with last month param", function() {
                 var timeParam;
                 beforeEach(function(){
-                    timeParam = "day";
+                    timeParam = "month";
                 });
                 it("should update model selected start and end dates using datepicker method", function(done) {
                     var cb = function() {
