@@ -10,7 +10,7 @@ define(function(require, exports, module) {
 
         /* Returns ISOString object enforcing startDate precedes endDate when given
          * start and end ISOStrings. Transforms returned start and end dates based on
-         * pickType. 
+         * pickType.
          */
         exports.pickDates = function(pickType, start, end, cb) {
             var start = moment(start),
@@ -36,6 +36,20 @@ define(function(require, exports, module) {
             cb(response)
 
 
+        };
+
+        /* Computes new start and end ISOStrings for a specified time period type up to a
+         * given date. Useful for specifying "current month" or "current quarter" start
+         * and end dates.
+         */
+        exports.current = function(type, endDate, cb) {
+            var curr = moment(endDate),
+                start = moment(endDate).startOf(type);
+
+            cb({
+                start: start.format(outputFormat),
+                end: curr.format(outputFormat)
+            })
         };
 
         /* Computes new start and end dates for numPrev days/months/quarters before given

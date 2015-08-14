@@ -108,20 +108,74 @@ define(function(require, exports, module) {
             });
         });
 
-        describe("untilFirstOf method", function() {
+        describe("current method", function() {
             describe("when type is set to week", function() {
+
+                var type;
+                beforeEach(function() {
+                    type = "week";
+                });
+
                 describe("when given end date", function() {
-                    it("should return moment.start of with correct end and start");
+
+                    var endDate;
+                    beforeEach(function() {
+                        endDate = "2015-08-14";
+                    });
+
+                    it("should return moment.startOf with correct end and start", function(done) {
+                        var cb = function(response) {
+                            expect(response.start).toBe("2015-08-09");
+                            expect(response.end).toBe("2015-08-14");
+                            done();
+                        }
+                        instance.current(type, endDate, cb);
+                    });
                 });
             });
             describe("when type is set to month", function() {
+
+                var type;
+                beforeEach(function() {
+                    type = "month";
+                });
                 describe("when given end date", function() {
-                    it("should return moment.start of with correct end and start");
+
+                    var endDate;
+                    beforeEach(function() {
+                        endDate = "2015-08-14";
+                    });
+
+                    it("should return moment.startOf with correct end and start", function(done) {
+                        var cb = function(response) {
+                            expect(response.start).toBe("2015-08-01");
+                            expect(response.end).toBe("2015-08-14");
+                            done();
+                        }
+                        instance.current(type, endDate, cb);
+                    });
                 });
             });
             describe("when type is set to quarter", function() {
+
+                var type;
+                beforeEach(function() {
+                    type = "quarter";
+                });
                 describe("when given end date", function() {
-                    it("should return moment.start of with correct end and start");
+
+                    var endDate;
+                    beforeEach(function() {
+                        endDate = "2015-03-01";
+                    });
+                    it("should return moment.startOf with correct end and start", function(done) {
+                        var cb = function(response) {
+                            expect(response.start).toBe("2015-01-01");
+                            expect(response.end).toBe("2015-03-01");
+                            done();
+                        }
+                        instance.current(type, endDate, cb);
+                    });
                 });
             });
         });
