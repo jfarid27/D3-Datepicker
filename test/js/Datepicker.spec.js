@@ -108,6 +108,24 @@ define(function(require, exports, module) {
             });
         });
 
+        describe("untilFirstOf method", function() {
+            describe("when type is set to week", function() {
+                describe("when given end date", function() {
+                    it("should return moment.start of with correct end and start");
+                });
+            });
+            describe("when type is set to month", function() {
+                describe("when given end date", function() {
+                    it("should return moment.start of with correct end and start");
+                });
+            });
+            describe("when type is set to quarter", function() {
+                describe("when given end date", function() {
+                    it("should return moment.start of with correct end and start");
+                });
+            });
+        });
+
         describe("generatePrevious method", function() {
 
             describe("when type is set to 'quarter'", function() {
