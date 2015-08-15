@@ -33,9 +33,7 @@ define(function(require, exports, module) {
                 response.start = (!shouldReduce) ? start.format(outputFormat) : end.format(outputFormat);
             }
 
-            cb(response)
-
-
+            cb(response);
         };
 
         /* Computes new start and end ISOStrings for a specified time period type up to a
@@ -64,6 +62,17 @@ define(function(require, exports, module) {
                 end: curr.format(outputFormat)
             });
         };
+
+        /* Getter/Setter for outputFormat
+         */
+         exports.outputFormat = function() {
+             if (arguments.length > 0) {
+                 outputFormat = arguments[0];
+                 return exports;
+             }
+
+             return outputFormat;
+         };
 
         return exports;
     }

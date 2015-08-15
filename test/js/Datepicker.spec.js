@@ -5,11 +5,17 @@ define(function(require, exports, module) {
         var instance, Datepicker, moment;
         beforeEach(function() {
 
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = 500;
+
             moment = require('moment');
 
             Datepicker = require("src/js/Datepicker");
 
             instance = Datepicker(moment);
+        });
+
+        afterEach(function() {
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
         });
 
         describe("pickDates method", function() {
