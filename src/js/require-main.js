@@ -30,8 +30,10 @@ require.config({
     'waitSeconds': 1
 })
 
-require(['moment', 'underscore', './src/js/d3-calendar', './src/js/app'], function(){
+require(['./src/js/app'], function(){
+
     
+
     return;
 })
 

@@ -18,6 +18,71 @@ define(function(require, exports, module) {
             jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
         });
 
+        describe("computeRowColumnFromIndex", function() {
+            describe("when given index", function() {
+
+                var inputs, expected, result
+                beforeEach(function() {
+                    inputs = [7, 24, 32, 12];
+                    expected = [{row:1,col:7}, {row:4, col:3}, {row:5, col:4}, {row:2,col:5}];
+                    result = inputs.map(function(index){
+                        return d3Calendar.computeRowColumnFromIndex(index);
+                    });
+                });
+
+                it("should return proper row", function() {
+                    expect(result[0].row).toBe(expected[0].row);
+                    expect(result[1].row).toBe(expected[1].row);
+                    expect(result[2].row).toBe(expected[2].row);
+                    expect(result[3].row).toBe(expected[3].row);
+                });
+
+                it("should return proper column", function() {
+                    expect(result[0].col).toBe(expected[0].col);
+                    expect(result[1].col).toBe(expected[1].col);
+                    expect(result[2].col).toBe(expected[2].col);
+                    expect(result[3].col).toBe(expected[3].col);
+                });
+            });
+        });
+
+        describe("computeIndexes method", function() {
+            describe("when given first day and list of date objects", function() {
+
+                var firstDay, monthDays;
+                beforeEach(function() {
+                    firstDay = "2015-08-01";
+                    d3Calendar.generateMonthsDays(firstDay, function(res) {
+                        monthDays = res
+                    })
+                })
+
+                it("should return date objects with proper formated calendar index", function(done) {
+                    var cb = function(response) {
+                        var firstDay = response.filter(function(dateObj) {
+                            return (dateObj.date === "2015-08-01");
+                        })[0];
+
+                        var idesDay = response.filter(function(dateObj) {
+                            return (dateObj.date === "2015-08-15");
+                        })[0];
+
+                        var twentyNinth = response.filter(function(dateObj) {
+                            return (dateObj.date === "2015-08-29");
+                        })[0];
+
+                        expect(firstDay.index).toBe(7);
+                        expect(idesDay.index).toBe(21);
+                        expect(twentyNinth.index).toBe(35);
+                        done();
+
+                    };
+
+                    d3Calendar.computeIndexes(firstDay, monthDays, cb);
+                });
+            });
+        });
+
         describe("groupByDay method", function() {
             describe("when given list of date objects", function() {
 
