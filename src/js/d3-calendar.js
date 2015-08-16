@@ -5,73 +5,175 @@ define(function(require, exports, module) {
         //Some useful constants
         var outputFormat = "YYYY-MM-DD",
             daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            eventEmitter = d3.dispatch('dateClick', 'draw'),
-            svg, calendarOptions;
+            shortDaysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
 
         //D3 constants
         var xScale = d3.scale.linear()
-            .domain([1, 8]);
+                .domain([1, 8]),
+            yScale = d3.scale.linear()
+                .domain([1, 7]),
+            eventEmitter = d3.dispatch('dateClick', 'draw'),
+            svg, calendarOptions;
 
-        var yScale = d3.scale.linear()
-            .domain([1, 7]);
-
-        var calendarGroup;
+        var calendarGroup, calendarTextGroup, calendarRectGroup, calendarLabelDays, calendarLabelMonth;
 
         var exports = function(selectedSvg, options) {
             svg = selectedSvg;
             calendarOptions = options;
 
             calendarGroup = svg.append("g").classed("d3Calendar", true);
+            calendarTextGroup = calendarGroup.append("g").classed("calendar-text", true);
+            calendarRectGroup = calendarGroup.append("g").classed("calendar-rects", true);
+            calendarLabelGroup = calendarGroup.append("g").classed("calendar-labels", true);
+            calendarLabelMonth = calendarLabelGroup.append("g").classed("calendar-month-label", true);
+            calendarLabelDays = calendarLabelGroup.append("g").classed("calendar-days-labels", true);
 
             return;
         };
 
+        /* Draws calendar on given svg selector.
+         */
         eventEmitter.on('draw', function(startDate, selectedDates) {
+
+            //Pretty much making 8 rows where the first row is for labels
+            var labelGutter = (calendarOptions.y.max - calendarOptions.y.min) * (1/8)
+
             xScale.range([calendarOptions.x.min, calendarOptions.x.max]);
-            yScale.range([calendarOptions.y.min, calendarOptions.y.max]);
+            yScale.range([calendarOptions.y.min + labelGutter, calendarOptions.y.max]);
+
+            exports.generateMonthsDays(startDate, function(days){
+                exports.computeIndexes(startDate, days, function(indexedDays){
+                    exports.drawCalendarTextElements(calendarTextGroup, indexedDays);
+                    exports.drawCalendarRectElements(calendarRectGroup, indexedDays, selectedDates);
+                });
+            });
+
+            exports.drawCalendarMonth(calendarLabelMonth, startDate);
+            exports.drawCalendarWeekdays(calendarLabelDays);
+
+        });
+
+        /* Adds calendar month text to upper region of calendar
+         */
+        exports.drawCalendarMonth = function(svgGroup, startDate) {
+
+            var textOffsetX = .9*(xScale(2) - xScale(1))/2;
+            var textOffsetY  = (yScale(2) - yScale(1))/3;
+
+            var monthName = exports.getMonthName(startDate);
+            svgGroup.append("text")
+                .attr("class", "calendar-month-label")
+                .style("text-anchor", "middle")
+                .attr("x", function(d, i){
+                    return xScale(4) + textOffsetX;
+                })
+                .attr("y", function(d, i){
+                    return textOffsetY;
+                })
+                .text(monthName);
+
+        };
+
+        /* Adds calendar weekday to upper region of calendar
+         */
+        exports.drawCalendarWeekdays = function(svgGroup) {
+            var textOffsetX = (xScale(2) - xScale(1))/2;
+            var textOffsetY  = 2.5*(yScale(2) - yScale(1))/3;
+
+            svgGroup.selectAll("text").data(shortDaysOfWeek).enter()
+                .append("text")
+                .attr("class", "calendar-day-label")
+                .style("text-anchor", "middle")
+                .attr("x", function(d, i){
+                    return xScale(i+1) + textOffsetX;
+                })
+                .attr("y", function(d, i){
+                    return textOffsetY;
+                })
+                .text(function(d) { return d });
+        };
+
+        /* Returns month name for given ISOString
+         */
+        exports.getMonthName = function(day) {
+            return moment(day).format("MMMM");
+        };
+
+        /* Adds all calendar text to given calendar using indexed date objects
+         */
+        exports.drawCalendarTextElements =  function(svgGroup, indexedDays) {
+
+            var textOffsetX = (xScale(2) - xScale(1))/2;
+            var textOffsetY = (yScale(2) - yScale(1))/2;
+
+            svgGroup.selectAll("text").data(indexedDays).enter()
+                .append("text")
+                    .attr("class", "date-text")
+                    .style("text-anchor", "middle")
+                    .attr("x", function(d, i){
+                        var position = exports.computeRowColumnFromIndex(d.index);
+                        return xScale(position.col) + textOffsetX;
+                    })
+                    .attr("y", function(d, i){
+                        var position = exports.computeRowColumnFromIndex(d.index);
+                        return yScale(position.row) + textOffsetY;
+                    })
+                    .attr("day", function(d) { return d.date })
+                    .attr("row", function(d) {
+                        var position = exports.computeRowColumnFromIndex(d.index);
+                        return position.row;
+                    })
+                    .attr("col", function(d) {
+                        var position = exports.computeRowColumnFromIndex(d.index);
+                        return position.col;
+                    })
+                    .text(function(d) {
+                        return d.moment.format("D");
+                    });
+        };
+
+        /* Adds all calendar rects to given calendar using date objects
+         */
+        exports.drawCalendarRectElements = function(svgGroup, indexedDays, selectedDates) {
 
             var rectWidth = xScale(2) - xScale(1);
             var rectHeight = yScale(2) - yScale(1);
 
-            exports.generateMonthsDays(startDate, function(days){
-                exports.computeIndexes(startDate, days, function(indexedDays){
+            svgGroup.selectAll("rect").data(indexedDays).enter()
+                .append("rect")
+                    .attr("class", "date-rect")
+                    .attr("x", function(d, i){
+                        var position = exports.computeRowColumnFromIndex(d.index);
+                        return xScale(position.col);
+                    })
+                    .attr("y", function(d, i){
+                        var position = exports.computeRowColumnFromIndex(d.index);
+                        return yScale(position.row);
+                    })
+                    .attr("width", rectWidth)
+                    .attr("height", rectHeight)
+                    .attr("day", function(d) { return d.date })
+                    .attr("row", function(d) {
+                        var position = exports.computeRowColumnFromIndex(d.index);
+                        return position.row;
+                    })
+                    .style("fill", "white")
+                    .style("opacity", function(d){
+                        if (_.indexOf(selectedDates, d.date) > -1) {
+                            return ".5"
+                        }
+                        return "0"
+                    })
+                    .attr("col", function(d) {
+                        var position = exports.computeRowColumnFromIndex(d.index);
+                        return position.col;
+                    })
+                    .on('click', function(e) {
+                        var self = d3.select(this);
+                        eventEmitter.dateClick(self.attr("day"))
+                    })
 
-                    //Add all rect days to calendar
-                    calendarGroup.selectAll("rect").data(indexedDays).enter()
-                        .append("rect")
-                            .attr("class", "date")
-                            .attr("x", function(d, i){
-                                var position = exports.computeRowColumnFromIndex(d.index);
-                                return xScale(position.col);
-                            })
-                            .attr("y", function(d, i){
-                                var position = exports.computeRowColumnFromIndex(d.index);
-                                return yScale(position.row);
-                            })
-                            .attr("width", rectWidth)
-                            .attr("height", rectHeight)
-                            .attr("day", function(d) { return d.date })
-                            .attr("row", function(d) {
-                                var position = exports.computeRowColumnFromIndex(d.index);
-                                return position.row;
-                            })
-                            .attr("col", function(d) {
-                                var position = exports.computeRowColumnFromIndex(d.index);
-                                return position.col;
-                            })
-                            .on('click', function(e) {
-                                var self = d3.select(this);
-                                eventEmitter.dateClick(self.attr("day"))
-                            })
-
-                    //Add text days to calendar
-
-                    //Add calendar month to calendar
-
-                })
-            })
-
-        });
+        };
 
         /* Returns closured eventEmitter.
          */
@@ -139,7 +241,26 @@ define(function(require, exports, module) {
             exports.generateMonthsDays(nextDay.format(outputFormat), cb, accumulator.concat([startDateObj]));
         };
 
-         return exports;
+        /* Getter setter for short day of week string names
+         */
+        exports.shortDaysOfWeek = function() {
+            if (arguments.length) {
+                shortDaysOfWeek = arguments[0];
+                return exports;
+            }
+            return shortDaysOfWeek;
+        }
+
+        /* Getter setter for day of week string names
+         */
+        exports.daysOfWeek = function() {
+            if (arguments.length) {
+                daysOfWeek = arguments[0];
+                return exports;
+            }
+            return daysOfWeek;
+        }
+        return exports;
     };
 
     module.exports = D3Calendar

@@ -18,6 +18,18 @@ define(function(require, exports, module) {
             jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
         });
 
+        describe("getMonthName", function() {
+            describe("when given ISOString", function() {
+                var day;
+                beforeEach(function() {
+                    day = "2015-08-14";
+                });
+                it("should compute month", function() {
+                    expect(d3Calendar.getMonthName(day)).toBe("August")
+                });
+            });
+        });
+
         describe("computeRowColumnFromIndex", function() {
             describe("when given index", function() {
 
