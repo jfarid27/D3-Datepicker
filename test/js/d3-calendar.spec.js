@@ -6,7 +6,7 @@ define(function(require, exports, module) {
 
     describe("D3 calendar integration tests", function() {
 
-        var d3Calendar, D3Calendar
+        var d3Calendar, D3Calendar;
         beforeEach(function() {
             jasmine.DEFAULT_TIMEOUT_INTERVAL = 500;
             D3Calendar = require("src/js/d3-calendar");
@@ -16,6 +16,45 @@ define(function(require, exports, module) {
 
         afterEach(function() {
             jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
+        });
+
+        describe("monthGenerator method", function() {
+            describe("when given ISOString", function() {
+
+                var startDate, expected;
+                beforeEach(function() {
+                    startDate = "2015-04-01";
+                    expected = {
+                        "month": "Apr",
+                        "year": "2015"
+                    }
+                });
+                it("should return monthObject", function() {
+                    var response = instance.monthGenerator(startDate);
+                    expect(response.month).toBe(expected.month);
+                    expect(response.year).toBe(expected.year);
+                });
+            });
+        });
+
+        describe("quarterGenerator method", function() {
+            describe("when given ISOString", function() {
+                var startDate, expected;
+                beforeEach(function() {
+                    startDate = "2015-04-01";
+                    expected = {
+                        "months": ["Apr", "May", "Jun"],
+                        "year": "2015"
+                    }
+                });
+                it("should return quarterObject", function() {
+                    var response = instance.quarterGenerator(startDate);
+                    expect(response.months[0]).toBe(expected.months[0]);
+                    expect(response.months[1]).toBe(expected.months[1]);
+                    expect(response.months[2]).toBe(expected.months[2]);
+                    expect(response.year).toBe(expected.year);
+                });
+            });
         });
 
         describe("getMonthName", function() {

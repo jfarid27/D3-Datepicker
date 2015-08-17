@@ -241,6 +241,34 @@ define(function(require, exports, module) {
             exports.generateMonthsDays(nextDay.format(outputFormat), cb, accumulator.concat([startDateObj]));
         };
 
+        /* Returns quarterObject when given start ISOString
+         */
+        exports.quarterGenerator = function(startDate) {
+            var q = moment(startDate).startOf("quarter");
+            var interpolatedMonths = [0, 1, 2].reduce(function(acc, month) {
+                var inter = moment(startDate).startOf("quarter")
+                    .add(month, "month").format("MMM");
+                acc.push(inter);
+                return acc;
+            }, []);
+
+            return {
+                "months": interpolatedMonths,
+                "year": q.format("YYYY")
+            };
+        };
+
+        /* Returns monthObject when given start ISOString
+         */
+        exports.monthGenerator = function(startDate) {
+            var m = moment(startDate);
+
+            return {
+                "month": m.startOf("month").format("MMM"),
+                "year": m.format("YYYY")
+            };
+        };
+
         /* Getter setter for short day of week string names
          */
         exports.shortDaysOfWeek = function() {

@@ -27,7 +27,7 @@ define(function(require, exports, module) {
                         max: 900
                     }
                 };
-            })
+            });
 
             describe("when given type left", function() {
 
