@@ -13,23 +13,38 @@ define(function(require, exports, module) {
 
         var emitters = [leftEmitter, centerEmitter, rightEmitter];
 
-        var exports = function(svg, options) {
+        var svg;
+
+        var exports = function(options) {
             left(svg, exports.optionsTransformer("left", options));
             right(svg, exports.optionsTransformer("right", options));
             center(svg, exports.optionsTransformer("center", options));
 
-            eventEmitter.on('draw', function(months, type, selectedDates) {
+            eventEmitter.on("draw", function(months, type, selectedDates) {
 
-                if (type === "day"){
+                if (type === "day") {
                     months.map(function(month, i) {
                         emitters[i].drawDay(month, selectedDates);
                         emitters[i].on("dateClick", function(date) {
                             eventEmitter.dateClick(date);
-                        })
+                        });
+                    });
+                }
+
+                if (type === "month") {
+                    months.map(function(month, i) {
+                        emitters[i].drawMonth(month, selectedDates);
+                        emitters[i].on("dateClick", function(date) {
+                            eventEmitter.dateClick(date);
+                        });
                     })
                 }
 
-            })
+            });
+
+            eventEmitter.on("clean", function() {
+                svg.selectAll("*").remove();
+            });
 
         };
 
@@ -66,9 +81,18 @@ define(function(require, exports, module) {
 
         /* Returns closured eventEmitter.
          */
-        exports.emitter = function(){
+        exports.emitter = function() {
             return eventEmitter;
-        }
+        };
+
+        exports.svg = function() {
+            if (arguments.length > 0) {
+                svg = arguments[0];
+                return exports;
+            }
+
+            return svg
+        };
 
         return exports;
 

@@ -13,10 +13,12 @@ define(function(require, exports, module) {
                 .domain([1, 8]),
             yScale = d3.scale.linear()
                 .domain([1, 7]),
-            eventEmitter = d3.dispatch('dateClick', 'drawDay'),
+            eventEmitter = d3.dispatch("dateClick", "drawDay", "drawMonth"),
             svg, calendarOptions;
 
-        var calendarGroup, calendarTextGroup, calendarRectGroup, calendarLabelDays, calendarLabelMonth;
+        var calendarGroup, calendarTextGroup, calendarRectGroup,
+            calendarLabelDays, calendarLabelMonth, calendarLargeTextGroup,
+            calendarIconsGroup;
 
         var exports = function(selectedSvg, options) {
             svg = selectedSvg;
@@ -40,20 +42,40 @@ define(function(require, exports, module) {
          */
         exports.setGroupsMonth = function() {
             calendarGroup.selectAll("*").remove();
-            calendarTextGroup = calendarGroup.append("g").classed("calendar-text", true);
             calendarRectGroup = calendarGroup.append("g").classed("calendar-rects", true);
-            calendarLabelGroup = calendarGroup.append("g").classed("calendar-labels", true);
-            calendarLabelMonth = calendarLabelGroup.append("g").classed("calendar-month-label", true);
-            calendarLabelDays = calendarLabelGroup.append("g").classed("calendar-days-labels", true);
+            calendarLargeTextGroup = calendarGroup.append("g").classed("calendar-large-text", true);
+            calendarIconsGroup = calendarGroup.append("g").classed("calendar-icons", true);
         };
 
-        /* Draws calendar on given svg selector.
+        exports.setGroupsQuarter = function() {
+            calendarGroup.selectAll("*").remove();
+            calendarLargeTextGroup = calendarGroup.append("g").classed("calendar-large-text", true);
+            calendarIconsGroup = calendarGroup.append("g").classed("calendar-icons", true);
+        }
+
+        /* Draws month element on given svg selector
+         */
+        eventEmitter.on("drawMonth", function(startDate, selectedDates) {
+            exports.setGroupsMonth();
+
+            var monthObj = exports.monthGenerator(startDate),
+                monthText = monthObj.month + " " + monthObj.year;
+
+            xScale.range([calendarOptions.x.min, calendarOptions.x.max]);
+            yScale.range([calendarOptions.y.min, calendarOptions.y.max]);
+
+            exports.drawLargeRect(calendarRectGroup, startDate, selectedDates);
+            exports.drawLargeTextCentered(calendarLargeTextGroup, monthText, startDate, selectedDates);
+            exports.drawMonthCalendarIcon(calendarIconsGroup, startDate, selectedDates);
+        });
+
+        /* Draws day calendar on given svg selector.
          */
         eventEmitter.on('drawDay', function(startDate, selectedDates) {
             exports.setGroupsDay();
 
             //Pretty much making 8 rows where the first row is for labels
-            var labelGutter = (calendarOptions.y.max - calendarOptions.y.min) * (1/8)
+            var labelGutter = (calendarOptions.y.max - calendarOptions.y.min) * (1/8);
 
             xScale.range([calendarOptions.x.min, calendarOptions.x.max]);
             yScale.range([calendarOptions.y.min + labelGutter, calendarOptions.y.max]);
@@ -70,11 +92,75 @@ define(function(require, exports, module) {
 
         });
 
+        /* Adds month calendar icon to given svg group
+         */
+        exports.drawMonthCalendarIcon = function(svgGroup, startDate, selectedDates) {
+            svgGroup.append("i")
+                .attr("class", function(d) {
+                    var output = "fa fa-calendar fa-lg";
+                    if (_.indexOf(selectedDates, startDate) > -1){
+                        output = "fa fa-calendar fa-lg selected";
+                    }
+                    return output;
+                });
+        };
+
+        /* Draws large rect on given svg selector. Used for selections on months and quarters
+         */
+        exports.drawLargeRect = function(svgGroup, startDate, selectedDates) {
+            svgGroup
+                .append("rect")
+                    .attr("class",  function(d){
+                        if (_.indexOf(selectedDates, startDate) > -1) {
+                            return "date-rect selected"
+                        }
+                        return "date-rect"
+                    })
+                    .attr("x", calendarOptions.x.min)
+                    .attr("y", calendarOptions.y.min)
+                    .attr("width", calendarOptions.x.max - calendarOptions.x.min)
+                    .attr("height", calendarOptions.y.max - calendarOptions.y.min)
+                    .style("fill", selectedDateColor)
+                    .style("opacity", function(d){
+                        if (_.indexOf(selectedDates, startDate) > -1) {
+                            return ".5"
+                        }
+                        return "0"
+                    })
+                    .on('click', function(e) {
+                        var self = d3.select(this);
+                        eventEmitter.dateClick(startDate)
+                    });
+        }
+
+        /* Adds large centered text for month and quarter visualization
+         */
+        exports.drawLargeTextCentered = function(svgGroup, text, startDate, selectedDates) {
+
+            svgGroup.append("text")
+                .attr("class", function(d) {
+                    var output = "calendar-large-label";
+                    if (_.indexOf(selectedDates, startDate) > -1){
+                        output = "calendar-large-label selected";
+                    }
+                    return output;
+                })
+                .attr("class", "calendar-large-label")
+                .style("text-anchor", "middle")
+                .attr("x", function(d, i){
+                    return calendarOptions.x.max - (calendarOptions.x.max - calendarOptions.x.min) / 2;
+                })
+                .attr("y", function(d, i){
+                    return .9 * calendarOptions.y.max / 3;
+                })
+                .text(text);
+        };
+
         /* Adds calendar month text to upper region of calendar
          */
         exports.drawCalendarMonth = function(svgGroup, startDate) {
 
-            var textOffsetX = .9*(xScale(2) - xScale(1))/2;
+            var textOffsetX = (xScale(2) - xScale(1))/2;
             var textOffsetY  = (yScale(2) - yScale(1))/3;
 
             var monthName = exports.getMonthName(startDate);
@@ -193,7 +279,7 @@ define(function(require, exports, module) {
                     .on('click', function(e) {
                         var self = d3.select(this);
                         eventEmitter.dateClick(self.attr("day"))
-                    })
+                    });
 
         };
 

@@ -30,7 +30,7 @@ define(function(require, exports, module) {
                     }
                 });
                 it("should return monthObject", function() {
-                    var response = instance.monthGenerator(startDate);
+                    var response = d3Calendar.monthGenerator(startDate);
                     expect(response.month).toBe(expected.month);
                     expect(response.year).toBe(expected.year);
                 });
@@ -48,7 +48,7 @@ define(function(require, exports, module) {
                     }
                 });
                 it("should return quarterObject", function() {
-                    var response = instance.quarterGenerator(startDate);
+                    var response = d3Calendar.quarterGenerator(startDate);
                     expect(response.months[0]).toBe(expected.months[0]);
                     expect(response.months[1]).toBe(expected.months[1]);
                     expect(response.months[2]).toBe(expected.months[2]);
