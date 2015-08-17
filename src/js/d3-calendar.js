@@ -5,35 +5,52 @@ define(function(require, exports, module) {
         //Some useful constants
         var outputFormat = "YYYY-MM-DD",
             daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            shortDaysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
+            shortDaysOfWeek = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"],
+            selectedDateColor = "#7fa";
 
         //D3 constants
         var xScale = d3.scale.linear()
                 .domain([1, 8]),
             yScale = d3.scale.linear()
                 .domain([1, 7]),
-            eventEmitter = d3.dispatch('dateClick', 'draw'),
+            eventEmitter = d3.dispatch('dateClick', 'drawDay'),
             svg, calendarOptions;
 
         var calendarGroup, calendarTextGroup, calendarRectGroup, calendarLabelDays, calendarLabelMonth;
 
         var exports = function(selectedSvg, options) {
             svg = selectedSvg;
-            calendarOptions = options;
-
             calendarGroup = svg.append("g").classed("d3Calendar", true);
+            calendarOptions = options;
+            return;
+        };
+
+        /* Draws calendar groups on set svg for day visualization
+         */
+        exports.setGroupsDay = function() {
+            calendarGroup.selectAll("*").remove();
             calendarTextGroup = calendarGroup.append("g").classed("calendar-text", true);
             calendarRectGroup = calendarGroup.append("g").classed("calendar-rects", true);
             calendarLabelGroup = calendarGroup.append("g").classed("calendar-labels", true);
             calendarLabelMonth = calendarLabelGroup.append("g").classed("calendar-month-label", true);
             calendarLabelDays = calendarLabelGroup.append("g").classed("calendar-days-labels", true);
+        };
 
-            return;
+        /* Draws calendar groups on set svg for month visualization
+         */
+        exports.setGroupsMonth = function() {
+            calendarGroup.selectAll("*").remove();
+            calendarTextGroup = calendarGroup.append("g").classed("calendar-text", true);
+            calendarRectGroup = calendarGroup.append("g").classed("calendar-rects", true);
+            calendarLabelGroup = calendarGroup.append("g").classed("calendar-labels", true);
+            calendarLabelMonth = calendarLabelGroup.append("g").classed("calendar-month-label", true);
+            calendarLabelDays = calendarLabelGroup.append("g").classed("calendar-days-labels", true);
         };
 
         /* Draws calendar on given svg selector.
          */
-        eventEmitter.on('draw', function(startDate, selectedDates) {
+        eventEmitter.on('drawDay', function(startDate, selectedDates) {
+            exports.setGroupsDay();
 
             //Pretty much making 8 rows where the first row is for labels
             var labelGutter = (calendarOptions.y.max - calendarOptions.y.min) * (1/8)
@@ -141,7 +158,12 @@ define(function(require, exports, module) {
 
             svgGroup.selectAll("rect").data(indexedDays).enter()
                 .append("rect")
-                    .attr("class", "date-rect")
+                    .attr("class",  function(d){
+                        if (_.indexOf(selectedDates, d.date) > -1) {
+                            return "date-rect selected"
+                        }
+                        return "date-rect"
+                    })
                     .attr("x", function(d, i){
                         var position = exports.computeRowColumnFromIndex(d.index);
                         return xScale(position.col);
@@ -157,7 +179,7 @@ define(function(require, exports, module) {
                         var position = exports.computeRowColumnFromIndex(d.index);
                         return position.row;
                     })
-                    .style("fill", "white")
+                    .style("fill", selectedDateColor)
                     .style("opacity", function(d){
                         if (_.indexOf(selectedDates, d.date) > -1) {
                             return ".5"

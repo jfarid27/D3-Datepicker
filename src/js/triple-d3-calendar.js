@@ -18,13 +18,17 @@ define(function(require, exports, module) {
             right(svg, exports.optionsTransformer("right", options));
             center(svg, exports.optionsTransformer("center", options));
 
-            eventEmitter.on('draw', function(months) {
-                months.map(function(month, i) {
-                    emitters[i].draw(month);
-                    emitters[i].on("dateClick", function(date) {
-                        eventEmitter.dateClick(date);
+            eventEmitter.on('draw', function(months, type, selectedDates) {
+
+                if (type === "day"){
+                    months.map(function(month, i) {
+                        emitters[i].drawDay(month, selectedDates);
+                        emitters[i].on("dateClick", function(date) {
+                            eventEmitter.dateClick(date);
+                        })
                     })
-                })
+                }
+
             })
 
         };
