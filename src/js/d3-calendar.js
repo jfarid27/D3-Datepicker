@@ -70,7 +70,8 @@ define(function(require, exports, module) {
 
             exports.drawLargeRect(calendarRectGroup, startDate, selectedDates);
             exports.drawLargeTextCentered(calendarLargeTextGroup, quarterText, startDate, selectedDates);
-
+            exports.addTripleMonthQuarter(calendarLabelQuarterMonth, quarterObj.months, startDate, selectedDates);
+            exports.addTripleMonthQuarterIcons(calendarIconsGroup, quarterObj.months, startDate, selectedDates)
         });
 
         /* Draws month element on given svg selector
@@ -111,6 +112,51 @@ define(function(require, exports, module) {
             exports.drawCalendarWeekdays(calendarLabelDays);
 
         });
+
+        /* Adds three month objects for quarters to given svg group.
+         */
+        exports.addTripleMonthQuarter = function(svgGroup, months, selectedDates) {
+
+            var xTextBox = (calendarOptions.x.max - calendarOptions.x.min) / 3,
+                xTextOffset = xTextBox / 2;
+
+
+            svgGroup.selectAll("text").data(months).enter()
+                .append("text")
+                    .attr("class", function(d) {
+                        var output = "calendar-months-large";
+                        return output;
+                    })
+                    .style("text-anchor", "middle")
+                    .attr("x", function(d, i){
+                        return calendarOptions.x.min + ( (i + 1) * xTextBox ) - xTextOffset;
+                    })
+                    .attr("y", function(d, i){
+                        return 2 * calendarOptions.y.max / 3;
+                    })
+                    .text(function(d) {
+                        return d
+                    });
+        };
+
+        /* Adds three month objects for quarters to given svg group.
+         */
+        exports.addTripleMonthQuarterIcons = function(svgGroup, months, selectedDates) {
+
+            var xTextBox = (calendarOptions.x.max - calendarOptions.x.min) / 3,
+                xTextOffset = xTextBox / 2;
+
+
+            svgGroup.selectAll("i").data(months).enter()
+                .append("i")
+                    .attr("class", function(d) {
+                        var output = "fa fa-calendar fa-lg";
+                        if (_.indexOf(selectedDates, d) > -1){
+                            output = "fa fa-calendar fa-lg selected";
+                        }
+                        return output
+                    });
+        };
 
         /* Adds month calendar icon to given svg group
          */
