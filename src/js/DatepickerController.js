@@ -35,7 +35,7 @@ define(function(require, exports, module) {
                 callback();
             }
 
-            self.trigger("changed:selectedDateRange")
+            self.trigger("changed:selectedDateRange");
         });
 
         /* Sets model.applied using model.selected and calls callback. Emits changed
@@ -92,8 +92,6 @@ define(function(require, exports, module) {
             }
             self.trigger("changed:unitTime");
         });
-
-        self.on("change:selectedDateRange", function() {})
 
     };
 
