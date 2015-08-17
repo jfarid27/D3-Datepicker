@@ -37,7 +37,16 @@ define(function(require, exports, module) {
                         emitters[i].on("dateClick", function(date) {
                             eventEmitter.dateClick(date);
                         });
-                    })
+                    });
+                }
+
+                if (type === "quarter") {
+                    months.map(function(quarterStart, i) {
+                        emitters[i].drawQuarter(quarterStart, selectedDates);
+                        emitters[i].on("dateClick", function(date) {
+                            eventEmitter.dateClick(date);
+                        });
+                    });
                 }
 
             });
@@ -85,6 +94,8 @@ define(function(require, exports, module) {
             return eventEmitter;
         };
 
+        /* Getter/setter for svg element to append tripe calendar
+         */
         exports.svg = function() {
             if (arguments.length > 0) {
                 svg = arguments[0];
@@ -95,7 +106,6 @@ define(function(require, exports, module) {
         };
 
         return exports;
-
     };
 
     return tripD3Calendar;

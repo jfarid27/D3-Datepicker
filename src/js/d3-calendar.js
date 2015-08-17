@@ -51,6 +51,7 @@ define(function(require, exports, module) {
          */
         exports.setGroupsQuarter = function() {
             calendarGroup.selectAll("*").remove();
+            calendarRectGroup = calendarGroup.append("g").classed("calendar-rects", true);
             calendarLargeTextGroup = calendarGroup.append("g").classed("calendar-large-text", true);
             calendarIconsGroup = calendarGroup.append("g").classed("calendar-icons", true);
             calendarLabelQuarterMonth = calendarGroup.append("g").classed("calendar-large-months", true)
@@ -58,11 +59,17 @@ define(function(require, exports, module) {
 
         /* Draws quarter element on given svg selector
          */
-        eventEmitter.on("drawQuarter", function() {
+        eventEmitter.on("drawQuarter", function(startDate, selectedDates) {
             exports.setGroupsQuarter();
 
             var quarterObj = exports.quarterGenerator(startDate),
                 quarterText = exports.quarterText(quarterObj);
+
+            xScale.range([calendarOptions.x.min, calendarOptions.x.max]);
+            yScale.range([calendarOptions.y.min, calendarOptions.y.max]);
+
+            exports.drawLargeRect(calendarRectGroup, startDate, selectedDates);
+            exports.drawLargeTextCentered(calendarLargeTextGroup, quarterText, startDate, selectedDates);
 
         });
 
