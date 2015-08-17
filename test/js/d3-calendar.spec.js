@@ -43,16 +43,34 @@ define(function(require, exports, module) {
                 beforeEach(function() {
                     startDate = "2015-04-01";
                     expected = {
+                        "quarter": "2",
                         "months": ["Apr", "May", "Jun"],
                         "year": "2015"
                     }
                 });
-                it("should return quarterObject", function() {
+                it("should return propert quarterObject", function() {
                     var response = d3Calendar.quarterGenerator(startDate);
                     expect(response.months[0]).toBe(expected.months[0]);
                     expect(response.months[1]).toBe(expected.months[1]);
                     expect(response.months[2]).toBe(expected.months[2]);
+                    expect(response.quarter).toBe(expected.quarter);
                     expect(response.year).toBe(expected.year);
+                });
+            });
+        });
+
+        describe("quarterText", function() {
+            describe("when given quarterObject", function() {
+
+                var mockQuarterObj, startDate, result;
+                beforeEach(function () {
+                    startDate = "2015-04-01";
+                    mockQuarterObj = d3Calendar.quarterGenerator(startDate);
+                    result = d3Calendar.quarterText(mockQuarterObj);
+                    expected = "Q2 2015";
+                });
+                it("should return properly formatted quarter title", function() {
+                    expect(result).toBe(expected);
                 });
             });
         });

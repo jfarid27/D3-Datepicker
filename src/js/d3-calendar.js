@@ -13,12 +13,12 @@ define(function(require, exports, module) {
                 .domain([1, 8]),
             yScale = d3.scale.linear()
                 .domain([1, 7]),
-            eventEmitter = d3.dispatch("dateClick", "drawDay", "drawMonth"),
+            eventEmitter = d3.dispatch("dateClick", "drawDay", "drawMonth", "drawQuarter"),
             svg, calendarOptions;
 
         var calendarGroup, calendarTextGroup, calendarRectGroup,
             calendarLabelDays, calendarLabelMonth, calendarLargeTextGroup,
-            calendarIconsGroup;
+            calendarIconsGroup, calendarLabelQuarterMonth;
 
         var exports = function(selectedSvg, options) {
             svg = selectedSvg;
@@ -47,11 +47,24 @@ define(function(require, exports, module) {
             calendarIconsGroup = calendarGroup.append("g").classed("calendar-icons", true);
         };
 
+        /* Draws calendar groups on set svg for quarter visualization
+         */
         exports.setGroupsQuarter = function() {
             calendarGroup.selectAll("*").remove();
             calendarLargeTextGroup = calendarGroup.append("g").classed("calendar-large-text", true);
             calendarIconsGroup = calendarGroup.append("g").classed("calendar-icons", true);
+            calendarLabelQuarterMonth = calendarGroup.append("g").classed("calendar-large-months", true)
         }
+
+        /* Draws quarter element on given svg selector
+         */
+        eventEmitter.on("drawQuarter", function() {
+            exports.setGroupsQuarter();
+
+            var quarterObj = exports.quarterGenerator(startDate),
+                quarterText = exports.quarterText(quarterObj);
+
+        });
 
         /* Draws month element on given svg selector
          */
@@ -361,6 +374,8 @@ define(function(require, exports, module) {
             }, []);
 
             return {
+                "moment": q,
+                "quarter": q.format("Q"),
                 "months": interpolatedMonths,
                 "year": q.format("YYYY")
             };
@@ -385,7 +400,14 @@ define(function(require, exports, module) {
                 return exports;
             }
             return shortDaysOfWeek;
-        }
+        };
+
+        /* Mini-transformer for quarter text. Useful to set using merchant profile
+         * data if quarter start month isn't the default moment quarters
+         */
+        exports.quarterText = function(quarterObj) {
+            return "Q" + quarterObj.quarter + " " + quarterObj.moment.format("YYYY");
+        };
 
         /* Getter setter for day of week string names
          */
