@@ -160,6 +160,27 @@ define(function(require, exports, module) {
                     controller.trigger("change:dateRangeLast", timeParam);
                 });
             });
+            describe("when called with last days30 param", function() {
+
+                var timeParam;
+                beforeEach(function(){
+                    timeParam = "days30";
+                });
+                it("should update model selected start and end dates using datepicker method", function(done) {
+                    var cb = function() {
+                        expect(controller.model.get("selected")).toBe("generatePreviousResponse");
+                        expect(datepicker.$args.generatePrevious[0]).toBe("2014-06-10");
+                        expect(datepicker.$args.generatePrevious[1]).toBe(30);
+                        expect(datepicker.$args.generatePrevious[2]).toBe("day");
+                        done();
+                    };
+                    controller.trigger("change:dateRangeLast", timeParam, cb);
+                });
+                it("should emit changed:selectedDateRange event", function(done) {
+                    controller.on("changed:selectedDateRange", done)
+                    controller.trigger("change:dateRangeLast", timeParam);
+                });
+            });
             describe("when called with last day param", function() {
                 var timeParam;
                 beforeEach(function(){

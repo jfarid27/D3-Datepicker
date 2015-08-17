@@ -29,6 +29,8 @@ define(function(require, exports, module) {
                 datepicker.generatePrevious(today, 1, "month", cb);
             } else if (periodSinceToday === "quarter") {
                 datepicker.generatePrevious(today, 1, "quarter", cb);
+            } else if (periodSinceToday === "days30") {
+                datepicker.generatePrevious(today, 30, "day", cb);
             }
 
             if (callback) {

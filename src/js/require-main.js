@@ -9,6 +9,7 @@ require.config({
         'underscore': ['node_modules/underscore/underscore'],
         'jquery': ['node_modules/jquery/dist/jquery'],
         'moment': ['node_modules/moment/moment'],
+        'text': ['lib/text'],
         'd3': ['node_modules/d3/d3']
     },
     'shim': {
@@ -31,10 +32,7 @@ require.config({
 })
 
 require(['./src/js/app'], function(){
-
-    
-
     return;
-})
+});
 
 })();
