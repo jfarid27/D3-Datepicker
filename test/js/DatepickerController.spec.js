@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-    describe("DatepickerController EventEmitter integration tests", function() {
+    describe("DatepickerController EventEmitter tests", function() {
 
         var DatepickerController = require("src/js/DatepickerController");
 
@@ -25,6 +25,11 @@ define(function(require, exports, module) {
                     arguments[3]("generatePreviousResponse")
                 };
 
+                self.interpolateFrom = function() {
+                    self.$args.interpolateFrom = arguments;
+                    arguments[3]("mockInterpolateFromResponse")
+                }
+
             };
 
             datepicker = new MockDatePicker();
@@ -33,6 +38,7 @@ define(function(require, exports, module) {
 
             model = new MockModel({
                 "unitTime": "day",
+                "currentlyViewing": "2014-08-01",
                 "selectionType": "start",
                 "today": "2014-06-10",
                 "applied": {
@@ -70,9 +76,32 @@ define(function(require, exports, module) {
 
             it("should emit changed:selectionType", function(done) {
                 controller.on("changed:selectionType", done);
-                controller.trigger("change:selectionType", "mockSelectionType");
+                controller.trigger("change:selectionType", selectionType);
             });
 
+        });
+
+        describe("on change:currentlyViewingRange event", function() {
+            describe("when given a viewing type", function() {
+                var selectionType, selectionSteps, selectionEndDate;
+                beforeEach(function() {
+                    selectionType = "mockSelectionType";
+                    selectionSteps = "mockSteps";
+                    selectionEndDate = "mockEndDate";
+                });
+                it("should update currentlyViewing in model using interpolateFrom", function(done) {
+                    var cb = function() {
+                        expect(controller.model.get("currentlyViewing")).toBe("mockInterpolateFromResponse");
+                        done();
+                    };
+
+                    controller.trigger("change:currentlyViewingRange", selectionEndDate, selectionSteps, selectionType, cb);
+                });
+                it("should emit changed:currentlyViewingRange", function(done) {
+                    controller.on("changed:currentlyViewingRange", done);
+                    controller.trigger("change:currentlyViewingRange", selectionType);
+                })
+            });
         });
 
         describe("on change:unitTime event", function() {

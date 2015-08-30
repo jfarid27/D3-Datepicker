@@ -51,7 +51,8 @@ define(function(require, exports, module) {
         };
 
         /* Computes new start and end dates for numPrev days/months/quarters before given
-         * endDate in ISOString format.
+         * endDate in ISOString format. Useful for generating start and end moments using
+         * common ranges from today like "30 days from today".
          */
         exports.generatePrevious = function(endDate, numPrev, type, cb) {
             var curr = moment(endDate);
@@ -62,6 +63,26 @@ define(function(require, exports, module) {
                 end: curr.format(outputFormat)
             });
         };
+
+        /* Computes list of month ISOStrings for numPrev days/months/quarters before
+         * given endDate. Useful for generating Month strings within given range to
+         * make calendar objects.
+         */
+        exports.generateCalendarDates = function(endDate, numPrev, type, cb) {
+
+            var output = [], j;
+
+            var j = moment(endDate).startOf(type);
+            var output = [j.format(outputFormat)];
+            console.log(output)
+            for (var i = 1; i < numPrev; i++) {
+                j.subtract(1, type);
+                output = [j.format(outputFormat)].concat(output);
+                console.log(output)
+            }
+
+            cb(output);
+        }
 
         /* Getter/Setter for outputFormat
          */

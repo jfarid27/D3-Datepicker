@@ -11,8 +11,24 @@ define(function(require, exports, module) {
 
         self.model = model;
 
-        /* Sets selected dates to last 7 days using model's today property as end date.
-         * Emits changed when completed.
+        /* Sets currentlyViewing information using datepicker's interpolateFrom method
+         */
+        self.on("change:currentlyViewingRange", function(endDate, numSteps, type, callback) {
+            var cb = function(interpolated) {
+                self.model.set("currentlyViewing", interpolated);
+
+                if (callback) {
+                    callback();
+                }
+
+                self.trigger("changed:currentlyViewingRange");
+            };
+
+            datepicker.interpolateFrom(endDate, numSteps, type, cb);
+        });
+
+        /* Sets selected dates to last periodSinceToday using model's today property
+         * as end date. Emits changed when completed.
          */
         self.on("change:dateRangeLast", function(periodSinceToday, callback) {
             var today = model.get("today");

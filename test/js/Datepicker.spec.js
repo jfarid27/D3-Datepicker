@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
 
-    describe("Datepicker integration tests", function() {
+    describe("Datepicker", function() {
 
         var instance, Datepicker, moment;
         beforeEach(function() {
@@ -18,38 +18,21 @@ define(function(require, exports, module) {
             jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
         });
 
-        describe("interpolateFrom method", function() {
+        describe("generateCalendarDates method", function() {
             describe("when given date", function() {
 
                 var endDate;
                 beforeEach(function(){
-                    endDate = "2015-08-14";
+                    endDate = "2014-08-14";
                 });
 
-                describe("and type is set to day", function() {
-                    var type, steps;
-                    beforeEach(function(){
-                        type = "day";
-                        steps = 30;
-                    });
-                    it("should generate ISOStrings for months included in range", function() {
-                        var cb = function(response) {
-                            expect(response[0]).toBe("2014-06-01");
-                            expect(response[1]).toBe("2014-07-01");
-                            expect(response[2]).toBe("2014-08-01");
-                            done();
-                        };
-
-                        instance.interpolateFrom(endDate, steps, type, cb);
-                    });
-                });
                 describe("and type is set to months", function() {
                     var type, steps;
                     beforeEach(function(){
-                        type = "months";
+                        type = "month";
                         steps = 3;
                     });
-                    it("should generate ISOStrings for months included in range", function() {
+                    it("should generate ISOStrings for months included in range", function(done) {
                         var cb = function(response) {
                             expect(response[0]).toBe("2014-06-01");
                             expect(response[1]).toBe("2014-07-01");
@@ -57,7 +40,7 @@ define(function(require, exports, module) {
                             done();
                         };
 
-                        instance.interpolateFrom(endDate, steps, type, cb);
+                        instance.generateCalendarDates(endDate, steps, type, cb);
                     });
                 });
                 describe("and type is set to quarter", function() {
@@ -66,7 +49,7 @@ define(function(require, exports, module) {
                         type = "quarter";
                         steps = 3;
                     });
-                    it("should generate ISOStrings for quarters included in range", function() {
+                    it("should generate ISOStrings for quarters included in range", function(done) {
                         var cb = function(response) {
                             expect(response[0]).toBe("2014-01-01");
                             expect(response[1]).toBe("2014-04-01");
@@ -74,7 +57,7 @@ define(function(require, exports, module) {
                             done();
                         };
 
-                        instance.interpolateFrom(endDate, steps, type, cb);
+                        instance.generateCalendarDates(endDate, steps, type, cb);
                     });
                 });
             });
