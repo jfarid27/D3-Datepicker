@@ -74,11 +74,9 @@ define(function(require, exports, module) {
 
             var j = moment(endDate).startOf(type);
             var output = [j.format(outputFormat)];
-            console.log(output)
             for (var i = 1; i < numPrev; i++) {
                 j.subtract(1, type);
                 output = [j.format(outputFormat)].concat(output);
-                console.log(output)
             }
 
             cb(output);

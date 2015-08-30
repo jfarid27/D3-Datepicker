@@ -27,6 +27,15 @@ define(function(require, exports, module) {
             return;
         };
 
+        /* Extended momemt function to query for moment in between two set dates inclusively
+         */
+        exports.isBetweenInc = function(moment, start, end) {
+            var isBetween = moment.isBetween(start, end);
+            var isOnEdge = moment.isSame(start) || moment.isSame(end);
+            var isInclusivelyBetween = isBetween || isOnEdge;
+            return isInclusivelyBetween;
+        }
+
         /* Draws calendar groups on set svg for day visualization
          */
         exports.setGroupsDay = function() {
@@ -177,7 +186,7 @@ define(function(require, exports, module) {
             svgGroup
                 .append("rect")
                     .attr("class",  function(d){
-                        if (_.indexOf(selectedDates, startDate) > -1) {
+                        if ( exports.isBetweenInc(d.moment, selectedDates.start, selectedDates.end) ) {
                             return "date-rect selected"
                         }
                         return "date-rect"
@@ -188,7 +197,7 @@ define(function(require, exports, module) {
                     .attr("height", calendarOptions.y.max - calendarOptions.y.min)
                     .style("fill", selectedDateColor)
                     .style("opacity", function(d){
-                        if (_.indexOf(selectedDates, startDate) > -1) {
+                        if ( exports.isBetweenInc(d.moment, selectedDates.start, selectedDates.end) ) {
                             return ".5"
                         }
                         return "0"
@@ -311,7 +320,8 @@ define(function(require, exports, module) {
             svgGroup.selectAll("rect").data(indexedDays).enter()
                 .append("rect")
                     .attr("class",  function(d){
-                        if (_.indexOf(selectedDates, d.date) > -1) {
+
+                        if ( exports.isBetweenInc(d.moment, selectedDates.start, selectedDates.end) ) {
                             return "date-rect selected"
                         }
                         return "date-rect"
@@ -333,7 +343,7 @@ define(function(require, exports, module) {
                     })
                     .style("fill", selectedDateColor)
                     .style("opacity", function(d){
-                        if (_.indexOf(selectedDates, d.date) > -1) {
+                        if ( exports.isBetweenInc(d.moment, selectedDates.start, selectedDates.end) ) {
                             return ".5"
                         }
                         return "0"

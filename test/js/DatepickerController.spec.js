@@ -25,9 +25,9 @@ define(function(require, exports, module) {
                     arguments[3]("generatePreviousResponse")
                 };
 
-                self.interpolateFrom = function() {
+                self.generateCalendarDates = function() {
                     self.$args.interpolateFrom = arguments;
-                    arguments[3]("mockInterpolateFromResponse")
+                    arguments[3]("mockGenerateCalendarDatesResponse")
                 }
 
             };
@@ -89,9 +89,9 @@ define(function(require, exports, module) {
                     selectionSteps = "mockSteps";
                     selectionEndDate = "mockEndDate";
                 });
-                it("should update currentlyViewing in model using interpolateFrom", function(done) {
+                it("should update currentlyViewing in model using generateCalendarDates", function(done) {
                     var cb = function() {
-                        expect(controller.model.get("currentlyViewing")).toBe("mockInterpolateFromResponse");
+                        expect(controller.model.get("currentlyViewing")).toBe("mockGenerateCalendarDatesResponse");
                         done();
                     };
 

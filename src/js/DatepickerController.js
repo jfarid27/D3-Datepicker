@@ -11,7 +11,7 @@ define(function(require, exports, module) {
 
         self.model = model;
 
-        /* Sets currentlyViewing information using datepicker's interpolateFrom method
+        /* Sets currentlyViewing information using datepicker's generateCalendarDates method
          */
         self.on("change:currentlyViewingRange", function(endDate, numSteps, type, callback) {
             var cb = function(interpolated) {
@@ -24,7 +24,7 @@ define(function(require, exports, module) {
                 self.trigger("changed:currentlyViewingRange");
             };
 
-            datepicker.interpolateFrom(endDate, numSteps, type, cb);
+            datepicker.generateCalendarDates(endDate, numSteps, type, cb);
         });
 
         /* Sets selected dates to last periodSinceToday using model's today property
