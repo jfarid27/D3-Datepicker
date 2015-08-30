@@ -72,6 +72,9 @@ define(function(require, exports, module) {
             "click .userSelectingUnitTimeByQuarter": function() {
 
             },
+            "click .user": function() {
+
+            }
         },
         "initialize": function() {
             this.render();
@@ -85,7 +88,7 @@ define(function(require, exports, module) {
 
             var emitter = instance.emitter();
 
-            emitter.draw(["2015-06-01", "2015-07-01", "2015-08-01"], "day", ["2015-08-01", "2015-08-02", "2015-08-03"]);
+            emitter.draw(["2015-06-01", "2015-07-01", "2015-08-01"], this.model.get("unitTime"), []);
         }
     });
 
